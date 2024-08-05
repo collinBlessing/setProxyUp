@@ -6,14 +6,9 @@ class SetProxy(CTk):
         self.geometry('500x300')
         self.title("Set npm proxy")
 
-
-
-
         # set default properties
         self.proxy_string = "proxy=http://"
-        self.commented_proxy_string = "#proxy=http://"
         self.https_proxy_string = "https-proxy=http://"
-        self.commented_https_proxy_string = "#https-proxy=http://"
 
         self.default_port = StringVar(value="8080")
 
@@ -62,15 +57,39 @@ class SetProxy(CTk):
     def apply_proxy(self):
         val_proxy_url = self.proxy_url.get()
         proxy_port = self.proxy_port.get()
-        print(f"Applying npm proxy to: {self.proxy_string}{val_proxy_url}:{proxy_port}")
-        print(f"Applying npm https-proxy to: {self.https_proxy_string}{val_proxy_url}:{proxy_port}")
+        try:
+            with open(self.file_title, 'r+') as npm_proxy_file:
+                self.new_proxy = f"{self.proxy_string}{val_proxy_url}:{proxy_port}"
+                self.new_port = f"{self.https_proxy_string}{val_proxy_url}:{proxy_port}"
+
+                content = f"{self.new_proxy}\n{self.new_port}"
+
+                print(content)
+
+                npm_proxy_file.seek(0)
+                npm_proxy_file.write(content)
+
+        except FileNotFoundError:
+            print("No previous proxy URL")
 
 
     def disable_proxy(self):
         val_proxy_url = self.proxy_url.get()
         proxy_port = self.proxy_port.get()
-        print(f"Applying npm proxy to: #{self.proxy_string}{val_proxy_url}:{proxy_port}")
-        print(f"Applying npm https-proxy to: #{self.https_proxy_string}{val_proxy_url}:{proxy_port}")
+        try:
+            with open(self.file_title, 'r+') as npm_proxy_file:
+                self.new_proxy = f"#{self.proxy_string}{val_proxy_url}:{proxy_port}"
+                self.new_port = f"#{self.https_proxy_string}{val_proxy_url}:{proxy_port}"
+
+                content = f"{self.new_proxy}\n{self.new_port}"
+
+                print(content)
+
+                npm_proxy_file.seek(0)
+                npm_proxy_file.write(content)
+
+        except FileNotFoundError:
+            print("No previous proxy URL")
 
     def fetch_previous_proxy(self):
         """Fetches the previous proxy from the specified file.
